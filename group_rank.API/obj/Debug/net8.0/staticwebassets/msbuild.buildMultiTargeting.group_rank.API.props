@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/group_rank.API.props" />
+</Project>
