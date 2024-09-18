@@ -5,15 +5,15 @@ namespace group_rank.API.Models
     public class Poll
     {
         public int Id { get; set; }
-        public string Title { get; set; }
+        public required string Title { get; set; }
         public bool IsFinished { get; set; }
-        public List<Option> Options { get; set; }
+        public required List<Option> Options { get; set; }
     }
 
     public class Option
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public List<int> Rankings { get; set; } = new List<int>(); // Stores rankings (e.g., points)
     }
 
