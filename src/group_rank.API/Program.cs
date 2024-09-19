@@ -52,11 +52,4 @@ app.UseRouting();
 // Map controllers
 app.MapControllers();
 
-// Seed the database (if needed)
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<PollContext>();
-    PollContext.Seed(context);  // Ensure you have a Seed method in PollContext
-}
-
 app.Run();

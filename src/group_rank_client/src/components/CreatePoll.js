@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createPoll } from '../services/pollService';
 
 const CreatePoll = () => {
     const [title, setTitle] = useState('');
     const [options, setOptions] = useState(['', '']);
-    const [pollLink, setPollLink] = useState('');
+    const navigate = useNavigate();
 
     const handleOptionChange = (index, value) => {
         const newOptions = [...options];
@@ -19,17 +20,23 @@ const CreatePoll = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Ensure that the options are structured as an array of objects with a 'name' field
-        const pollData = { 
-            title, 
-            options: options.filter(option => option.trim()).map(option => ({ name: option })) 
+        // Prepare poll data
+        const pollData = {
+            title,
+            options: options.filter(option => option.trim()).map(option => ({ name: option }))
         };
 
-        console.log(pollData);
-
         try {
-            const response = await createPoll(pollData);  // Send the formatted pollData
-            setPollLink(response.link);  // Save the generated poll link
+            // Send poll data to backend and receive the response
+            const response = await createPoll(pollData);
+
+            // Make sure pollId exists in the response
+            if (response && response.pollId) {
+                // Navigate to PollPage.js using pollId
+                navigate(`/poll/${response.pollId}`);
+            } else {
+                console.error('Poll creation failed: Missing pollId');
+            }
         } catch (error) {
             console.error('Error creating poll:', error);
         }
@@ -61,7 +68,6 @@ const CreatePoll = () => {
                 <button type="button" onClick={addOption}>Add Option</button>
                 <button type="submit">Create Poll</button>
             </form>
-            {pollLink && <p>Poll created! Share this link: <a href={pollLink}>{pollLink}</a></p>}
         </div>
     );
 };

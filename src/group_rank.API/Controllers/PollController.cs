@@ -34,7 +34,11 @@ public class PollController : ControllerBase
         _context.SaveChanges();
 
         // Return a generated link for the poll
-        return Ok(new { Link = $"https://localhost:5166/poll/{poll.Id}" });
+        return Ok(new 
+            {
+            pollId = poll.Id,
+            link = $"https://localhost:5166/poll/{poll.Id}"
+            });
     }
 
     // GET: api/poll/{id}
