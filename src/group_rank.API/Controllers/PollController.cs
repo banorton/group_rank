@@ -14,6 +14,13 @@ public class PollController : ControllerBase
         _context = context;
     }
 
+    // Handle preflight CORS requests (optional but useful for debugging)
+    [HttpOptions]
+    public IActionResult Preflight()
+    {
+        return Ok();
+    }
+
     // POST: api/poll
     [HttpPost]
     public IActionResult CreatePoll([FromBody] Poll poll)
@@ -27,7 +34,7 @@ public class PollController : ControllerBase
         _context.SaveChanges();
 
         // Return a generated link for the poll
-        return Ok(new { Link = $"https://thewebsite.com/poll/{poll.Id}" });
+        return Ok(new { Link = $"https://localhost:5166/poll/{poll.Id}" });
     }
 
     // GET: api/poll/{id}

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("group_rank.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dab88c80780b3852047b860ebee09f30472dc561")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8df2765d0a0a58220a8a0e1f131e9c11af0f972f")]
 [assembly: System.Reflection.AssemblyProductAttribute("group_rank.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("group_rank.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

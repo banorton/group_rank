@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://localhost:5001/api/poll'; // URL for your API
+const API_URL = 'https://localhost:5166/api/poll'; // URL for your API
 
 export const createPoll = async (pollData) => {
     const response = await axios.post(`${API_URL}`, pollData);
