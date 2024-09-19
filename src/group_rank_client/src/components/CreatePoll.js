@@ -18,9 +18,21 @@ const CreatePoll = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const pollData = { title, options: options.filter(option => option.trim()) };
-        const response = await createPoll(pollData);
-        setPollLink(response.link); // Save the generated poll link
+
+        // Ensure that the options are structured as an array of objects with a 'name' field
+        const pollData = { 
+            title, 
+            options: options.filter(option => option.trim()).map(option => ({ name: option })) 
+        };
+
+        console.log(pollData);
+
+        try {
+            const response = await createPoll(pollData);  // Send the formatted pollData
+            setPollLink(response.link);  // Save the generated poll link
+        } catch (error) {
+            console.error('Error creating poll:', error);
+        }
     };
 
     return (
