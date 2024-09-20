@@ -3,6 +3,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import { getPoll, submitRanking, endPoll, getPollResults } from '../services/pollService';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import './PollPage.css'; // Import the CSS file
 
 const ItemType = 'OPTION';
 
@@ -132,15 +133,7 @@ const PollPage = () => {
         return (
             <li
                 ref={(node) => dragRef(dropRef(node))}
-                style={{
-                    padding: '10px',
-                    marginBottom: '10px',
-                    border: '1px solid #ccc',
-                    borderRadius: '5px',
-                    backgroundColor: isDragging ? '#d3d3d3' : '#f9f9f9',
-                    opacity: isDragging ? 0.5 : 1,
-                    cursor: 'move',
-                }}
+                className={`poll-option ${isDragging ? 'dragging' : ''}`}
             >
                 {option.name}
             </li>
@@ -149,50 +142,69 @@ const PollPage = () => {
 
     return (
         <DndProvider backend={HTML5Backend}>
-            <div style={{ display: 'flex' }}>
+            <div className="poll-page">
                 {/* Main Poll and Ranking Section */}
-                <div style={{ flex: 3 }}>
+                <div className="poll-content">
                     {poll ? (
-                        <div>
-                            <h2>{poll.title}</h2>
+                        <div className="poll-container">
+                            <h1 className="poll-title">{poll.title}</h1>
                             {pollEnded ? (
-                                <div>
-                                    <h3>Final Rankings:</h3>
+                                // Final Rankings Display
+                                <div className="final-rankings">
+                                    <h2>Final Rankings:</h2>
                                     {finalRankings.length > 0 ? (
-                                        <ol>
-                                            {finalRankings.map((option) => (
-                                                <li key={option.id}>
-                                                    {option.name} - Average Rank: {option.averageRank === Number.MAX_VALUE ? 'N/A' : option.averageRank.toFixed(2)}
-                                                </li>
-                                            ))}
-                                        </ol>
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Rank</th>
+                                                    <th>Option</th>
+                                                    <th>Average Rank</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {finalRankings.map((option, index) => (
+                                                    <tr key={option.id}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{option.name}</td>
+                                                        <td>
+                                                            {option.averageRank === Number.MAX_VALUE ? 'N/A' : option.averageRank.toFixed(2)}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
                                     ) : (
                                         <p>No rankings available.</p>
                                     )}
                                 </div>
                             ) : submitted ? (
-                                <p>Ranking Submitted!</p>
+                                <p className="submitted-message">Ranking Submitted!</p>
                             ) : (
                                 <>
-                                    {/* Render the options and submit button */}
-                                    <ul style={{ listStyle: 'none', padding: 0 }}>
-                                        {rankings.map((option, index) => (
-                                            <PollOption
-                                                key={option.id}
-                                                option={option}
-                                                index={index}
-                                                moveOption={moveOption}
-                                            />
-                                        ))}
-                                    </ul>
-                                    <button onClick={handleSubmitRankings}>Submit Rankings</button>
+                                    {/* Instructions */}
+                                    <p className="poll-instructions">
+                                        Drag and drop the options to rank them in order of preference.
+                                    </p>
+                                    {/* Draggable Options Container */}
+                                    <div className="options-container">
+                                        <ul className="options-list">
+                                            {rankings.map((option, index) => (
+                                                <PollOption
+                                                    key={option.id}
+                                                    option={option}
+                                                    index={index}
+                                                    moveOption={moveOption}
+                                                />
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <button
+                                        onClick={handleSubmitRankings}
+                                        className="button"
+                                    >
+                                        Submit Rankings
+                                    </button>
                                 </>
-                            )}
-                            {/* Conditionally render the "End Poll" button */}
-                            {isCreator && !pollEnded && (
-                                <button onClick={handleEndPoll} style={{ marginTop: '20px' }}>
-                                    End Poll
-                                </button>
                             )}
                         </div>
                     ) : (
@@ -200,22 +212,35 @@ const PollPage = () => {
                     )}
                 </div>
 
-                {/* Sidebar for Poll Link */}
-                <div style={{ flex: 1, paddingLeft: '20px', borderLeft: '1px solid #ccc' }}>
-                    <h3>Share Poll Link</h3>
-                    <input
-                        type="text"
-                        value={pollLink}
-                        readOnly
-                        style={{ width: '100%' }}
-                    />
-                    <button
-                        onClick={() => {
-                            navigator.clipboard.writeText(pollLink);
-                        }}
-                    >
-                        Copy Link
-                    </button>
+                {/* Sidebar for Poll Link and End Poll Button */}
+                <div className="sidebar">
+                    <div>
+                        <h3>Share Poll Link</h3>
+                        <div className="share-link-container">
+                            <input
+                                type="text"
+                                value={pollLink}
+                                readOnly
+                                className="share-link-input"
+                            />
+                            <button
+                                onClick={() => {
+                                    navigator.clipboard.writeText(pollLink);
+                                }}
+                                className="copy-link-button"
+                            >
+                                Copy Link
+                            </button>
+                        </div>
+                    </div>
+                    {isCreator && !pollEnded && (
+                        <button
+                            onClick={handleEndPoll}
+                            className="end-poll-button"
+                        >
+                            End Poll
+                        </button>
+                    )}
                 </div>
             </div>
         </DndProvider>

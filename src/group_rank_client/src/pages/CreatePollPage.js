@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPoll } from '../services/pollService';
+import './CreatePollPage.css'; // Import the CSS file
 
 const CreatePollPage = () => {
     const [title, setTitle] = useState('');
@@ -43,31 +44,46 @@ const CreatePollPage = () => {
     };
 
     return (
-        <div>
-            <h2>Create a Poll</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Poll Title"
-                    required
-                />
-                <div>
-                    {options.map((option, index) => (
+        <div className="create-poll-page">
+            <div className="form-container">
+                <h1 className="create-poll-title">Create a Poll</h1>
+                <form onSubmit={handleSubmit}>
+                    <div>
                         <input
-                            key={index}
                             type="text"
-                            value={option}
-                            onChange={(e) => handleOptionChange(index, e.target.value)}
-                            placeholder={`Option ${index + 1}`}
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder="Poll Title"
                             required
+                            className="input-field"
                         />
-                    ))}
-                </div>
-                <button type="button" onClick={addOption}>Add Option</button>
-                <button type="submit">Create Poll</button>
-            </form>
+                        {options.map((option, index) => (
+                            <input
+                                key={index}
+                                type="text"
+                                value={option}
+                                onChange={(e) => handleOptionChange(index, e.target.value)}
+                                placeholder={`Option ${index + 1}`}
+                                required
+                                className="input-field option-input"
+                            />
+                        ))}
+                        <button
+                            type="button"
+                            onClick={addOption}
+                            className="button"
+                        >
+                            Add Option
+                        </button>
+                    </div>
+                    <button
+                        type="submit"
+                        className="button create-poll-button"
+                    >
+                        Create Poll
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };

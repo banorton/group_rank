@@ -1,3 +1,5 @@
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -5,8 +7,10 @@ namespace group_rank.API.Models
 {
     public class Poll
     {
-        public int Id { get; set; }
+        [Key]
+        public Guid Id { get; set; } = Guid.NewGuid();
         public required string Title { get; set; }
+
         public bool IsFinished { get; set; }
         public required List<Option> Options { get; set; }
     }
