@@ -30,22 +30,33 @@ public class PollController : ControllerBase
             return BadRequest("Invalid poll data.");
         }
 
+        // Set GUIDs for Options if not set
+        foreach (var option in poll.Options)
+        {
+            if (option.Id == Guid.Empty)
+            {
+                option.Id = Guid.NewGuid();
+            }
+        }
+
         _context.Polls.Add(poll);
         _context.SaveChanges();
 
         // Return a generated link for the poll
-        return Ok(new 
-            {
+        return Ok(new
+        {
             pollId = poll.Id,
             link = $"https://localhost:5166/poll/{poll.Id}"
-            });
+        });
     }
 
     // GET: api/poll/{id}
     [HttpGet("{id}")]
-    public IActionResult GetPoll(int id)
+    public IActionResult GetPoll(Guid id)
     {
-        var poll = _context.Polls.Include(p => p.Options).FirstOrDefault(p => p.Id == id);
+        var poll = _context.Polls
+            .Include(p => p.Options)
+            .FirstOrDefault(p => p.Id == id);
 
         if (poll == null)
         {
@@ -55,9 +66,9 @@ public class PollController : ControllerBase
         return Ok(poll);
     }
 
-    // POST: api/poll/{id}/rank
+    // POST: api/poll/{id}/submit-rankings
     [HttpPost("{id}/submit-rankings")]
-    public async Task<IActionResult> SubmitRankings(int id, [FromBody] List<RankingSubmission> rankings)
+    public async Task<IActionResult> SubmitRankings(Guid id, [FromBody] List<RankingSubmission> rankings)
     {
         if (rankings == null || !rankings.Any())
         {
@@ -83,7 +94,7 @@ public class PollController : ControllerBase
                 var newRanking = new Ranking
                 {
                     OptionId = option.Id,
-                             Rank = rankingSubmission.Rank
+                    Rank = rankingSubmission.Rank
                 };
                 option.Rankings.Add(newRanking);
             }
@@ -98,8 +109,9 @@ public class PollController : ControllerBase
         return Ok("Rankings submitted successfully.");
     }
 
+    // POST: api/poll/{id}/end
     [HttpPost("{id}/end")]
-    public async Task<IActionResult> EndPoll(int id)
+    public async Task<IActionResult> EndPoll(Guid id)
     {
         var poll = await _context.Polls.FindAsync(id);
 
@@ -114,8 +126,9 @@ public class PollController : ControllerBase
         return Ok("Poll ended successfully.");
     }
 
+    // GET: api/poll/{id}/results
     [HttpGet("{id}/results")]
-    public async Task<ActionResult<List<OptionResultDto>>> GetPollResults(int id)
+    public async Task<ActionResult<List<OptionResultDto>>> GetPollResults(Guid id)
     {
         var poll = await _context.Polls
             .Include(p => p.Options)
@@ -134,11 +147,11 @@ public class PollController : ControllerBase
 
         // Calculate average rank for each option
         var optionsWithAverageRank = poll.Options.Select(o => new OptionResultDto
-                {
-                Id = o.Id,
-                Name = o.Name,
-                AverageRank = o.Rankings.Any() ? o.Rankings.Average(r => r.Rank) : double.MaxValue
-                }).ToList();
+        {
+            Id = o.Id,
+            Name = o.Name,
+            AverageRank = o.Rankings.Any() ? o.Rankings.Average(r => r.Rank) : double.MaxValue
+        }).ToList();
 
         // Order options by average rank
         var orderedOptions = optionsWithAverageRank.OrderBy(o => o.AverageRank).ToList();

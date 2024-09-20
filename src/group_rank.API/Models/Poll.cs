@@ -17,31 +17,45 @@ namespace group_rank.API.Models
 
     public class Option
     {
-        public int Id { get; set; }
+        [Key]
+        public Guid Id { get; set; } = Guid.NewGuid();
+
         public required string Name { get; set; }
+
+        // Foreign key to Poll
+        public Guid PollId { get; set; }
+
+        [ForeignKey("PollId")]
+        public required Poll Poll { get; set; }
+
         public List<Ranking> Rankings { get; set; } = new List<Ranking>();
 
         [NotMapped]
-        public double AverageRank { get; set; } // Computed property, not stored in the database
+        public double AverageRank { get; set; }
     }
 
     public class Ranking
     {
-        public int Id { get; set; }
-        public int OptionId { get; set; }
-        public Option? Option { get; set; } // Made nullable
+        [Key]
+        public Guid Id { get; set; } = Guid.NewGuid(); // Change Id to Guid (optional for consistency)
+
+        public Guid OptionId { get; set; } // Change from int to Guid
+
+        [ForeignKey("OptionId")]
+        public Option? Option { get; set; } // Navigation property
+
         public int Rank { get; set; }
     }
 
     public class RankingSubmission
     {
-        public int OptionId { get; set; }
-        public int Rank { get; set; } // 1st place, 2nd place, etc.
+        public Guid OptionId { get; set; }
+        public int Rank { get; set; }
     }
 
     public class OptionResultDto
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public required string Name { get; set; }
         public double AverageRank { get; set; }
     }
