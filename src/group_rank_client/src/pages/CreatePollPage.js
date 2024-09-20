@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPoll } from '../services/pollService';
 
-const CreatePoll = () => {
+const CreatePollPage = () => {
     const [title, setTitle] = useState('');
     const [options, setOptions] = useState(['', '']);
     const navigate = useNavigate();
@@ -33,7 +33,7 @@ const CreatePoll = () => {
             // Make sure pollId exists in the response
             if (response && response.pollId) {
                 // Navigate to PollPage.js using pollId
-                navigate(`/poll/${response.pollId}`);
+                navigate(`/poll/${response.pollId}`, { state: { isCreator: true } });
             } else {
                 console.error('Poll creation failed: Missing pollId');
             }
@@ -72,4 +72,4 @@ const CreatePoll = () => {
     );
 };
 
-export default CreatePoll;
+export default CreatePollPage;

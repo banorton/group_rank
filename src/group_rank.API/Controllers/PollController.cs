@@ -56,52 +56,93 @@ public class PollController : ControllerBase
     }
 
     // POST: api/poll/{id}/rank
-    [HttpPost("{id}/rank")]
-    public IActionResult SubmitRanking(int id, [FromBody] List<OptionRanking> rankings)
+    [HttpPost("{id}/submit-rankings")]
+    public async Task<IActionResult> SubmitRankings(int id, [FromBody] List<RankingSubmission> rankings)
     {
-        var poll = _context.Polls.Include(p => p.Options).FirstOrDefault(p => p.Id == id);
+        if (rankings == null || !rankings.Any())
+        {
+            return BadRequest("Rankings cannot be null or empty.");
+        }
+
+        // Retrieve the poll and include options
+        var poll = await _context.Polls
+            .Include(p => p.Options)
+            .ThenInclude(o => o.Rankings)
+            .FirstOrDefaultAsync(p => p.Id == id);
 
         if (poll == null)
         {
-            return NotFound();
+            return NotFound("Poll not found.");
         }
 
-        foreach (var ranking in rankings)
+        foreach (var rankingSubmission in rankings)
         {
-            var option = poll.Options.FirstOrDefault(o => o.Id == ranking.OptionId);
+            var option = poll.Options.FirstOrDefault(o => o.Id == rankingSubmission.OptionId);
             if (option != null)
             {
-                option.Rankings.Add(ranking.Rank); // Store ranking (e.g., points for Borda Count)
+                var newRanking = new Ranking
+                {
+                    OptionId = option.Id,
+                             Rank = rankingSubmission.Rank
+                };
+                option.Rankings.Add(newRanking);
+            }
+            else
+            {
+                return BadRequest($"Option with ID {rankingSubmission.OptionId} not found in this poll.");
             }
         }
 
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
-        return Ok("Rankings submitted.");
+        return Ok("Rankings submitted successfully.");
     }
 
-    // PUT: api/poll/{id}/finish
-    [HttpPut("{id}/finish")]
-    public IActionResult FinishPoll(int id)
+    [HttpPost("{id}/end")]
+    public async Task<IActionResult> EndPoll(int id)
     {
-        var poll = _context.Polls.Include(p => p.Options).FirstOrDefault(p => p.Id == id);
+        var poll = await _context.Polls.FindAsync(id);
 
         if (poll == null)
         {
-            return NotFound();
+            return NotFound("Poll not found.");
         }
 
         poll.IsFinished = true;
+        await _context.SaveChangesAsync();
 
-        // Calculate rankings (for simplicity, we assume the Borda Count here)
-        var results = poll.Options.Select(o => new
+        return Ok("Poll ended successfully.");
+    }
+
+    [HttpGet("{id}/results")]
+    public async Task<ActionResult<List<OptionResultDto>>> GetPollResults(int id)
+    {
+        var poll = await _context.Polls
+            .Include(p => p.Options)
+            .ThenInclude(o => o.Rankings)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (poll == null)
         {
-            Option = o.Name,
-            Points = o.Rankings.Sum()
-        }).OrderByDescending(o => o.Points);
+            return NotFound("Poll not found.");
+        }
 
-        _context.SaveChanges();
+        if (!poll.IsFinished)
+        {
+            return BadRequest("Poll is not yet finished.");
+        }
 
-        return Ok(new { Results = results });
+        // Calculate average rank for each option
+        var optionsWithAverageRank = poll.Options.Select(o => new OptionResultDto
+                {
+                Id = o.Id,
+                Name = o.Name,
+                AverageRank = o.Rankings.Any() ? o.Rankings.Average(r => r.Rank) : double.MaxValue
+                }).ToList();
+
+        // Order options by average rank
+        var orderedOptions = optionsWithAverageRank.OrderBy(o => o.AverageRank).ToList();
+
+        return Ok(orderedOptions);
     }
 }

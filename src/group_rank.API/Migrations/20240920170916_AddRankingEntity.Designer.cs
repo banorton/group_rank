@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using group_rank.API.Data;
 
@@ -11,9 +12,11 @@ using group_rank.API.Data;
 namespace group_rank.API.Migrations
 {
     [DbContext(typeof(PollContext))]
-    partial class PollContextModelSnapshot : ModelSnapshot
+    [Migration("20240920170916_AddRankingEntity")]
+    partial class AddRankingEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

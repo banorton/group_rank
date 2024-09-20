@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace group_rank.API.Models
 {
@@ -14,12 +15,30 @@ namespace group_rank.API.Models
     {
         public int Id { get; set; }
         public required string Name { get; set; }
-        public List<int> Rankings { get; set; } = new List<int>(); // Stores rankings (e.g., points)
+        public List<Ranking> Rankings { get; set; } = new List<Ranking>();
+
+        [NotMapped]
+        public double AverageRank { get; set; } // Computed property, not stored in the database
     }
 
-    public class OptionRanking
+    public class Ranking
+    {
+        public int Id { get; set; }
+        public int OptionId { get; set; }
+        public Option? Option { get; set; } // Made nullable
+        public int Rank { get; set; }
+    }
+
+    public class RankingSubmission
     {
         public int OptionId { get; set; }
         public int Rank { get; set; } // 1st place, 2nd place, etc.
+    }
+
+    public class OptionResultDto
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+        public double AverageRank { get; set; }
     }
 }

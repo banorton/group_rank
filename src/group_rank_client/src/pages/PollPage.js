@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import { getPoll } from '../services/pollService';
+import { getPoll, submitRanking, endPoll, getPollResults } from '../services/pollService';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -10,7 +10,11 @@ const PollPage = () => {
     const { id } = useParams();  // Get the poll ID from the URL
     const location = useLocation(); // Access any state passed via navigation
     const [poll, setPoll] = useState(null);  // State for the poll data
-    const [rankings, setRankings] = useState([]);  // State to store rankings (as an array of options)
+    const [rankings, setRankings] = useState([]);  // State to store rankings
+    const [isCreator, setIsCreator] = useState(false); // Track if the user is the creator
+    const [submitted, setSubmitted] = useState(false);  // Track if rankings have been submitted
+    const [pollEnded, setPollEnded] = useState(false); // Track if the poll has ended
+    const [finalRankings, setFinalRankings] = useState([]); // Store final rankings
 
     const pollLink = location.state?.pollLink || `${window.location.origin}/poll/${id}`;  // Poll link
 
@@ -21,12 +25,54 @@ const PollPage = () => {
                 const data = await getPoll(id);  // Fetch the poll data from the backend
                 setPoll(data);
                 setRankings(data.options);  // Initialize rankings with poll options
+                setPollEnded(data.isFinished);
             } catch (error) {
                 console.error("Error fetching poll data:", error);
             }
         };
         fetchPoll();
-    }, [id]);
+
+        // Check if the user is the creator
+        if (location.state?.isCreator) {
+            setIsCreator(true);
+        }
+    }, [id, location.state]);
+
+    // Polling to check if poll has ended
+    useEffect(() => {
+        if (!pollEnded) {
+            const interval = setInterval(async () => {
+                try {
+                    const data = await getPoll(id);
+                    if (data.isFinished) {
+                        setPollEnded(true);
+                        clearInterval(interval);
+                    }
+                } catch (error) {
+                    console.error('Error checking poll status:', error);
+                    clearInterval(interval);
+                }
+            }, 5000); // Check every 5 seconds
+
+            return () => clearInterval(interval); // Clean up on unmount
+        }
+    }, [pollEnded, id]);
+
+    // Fetch final rankings when poll ends
+    useEffect(() => {
+        if (pollEnded) {
+            const fetchFinalRankings = async () => {
+                try {
+                    const results = await getPollResults(id);
+                    setFinalRankings(results);
+                } catch (error) {
+                    console.error('Error fetching final rankings:', error);
+                }
+            };
+
+            fetchFinalRankings();
+        }
+    }, [pollEnded, id]);
 
     // Handle ranking changes (drag-and-drop result)
     const moveOption = (dragIndex, hoverIndex) => {
@@ -36,14 +82,32 @@ const PollPage = () => {
         setRankings(updatedRankings);
     };
 
-    // Submit rankings (You'd need to implement this in your backend)
-    const handleSubmitRankings = () => {
+    // Submit rankings
+    const handleSubmitRankings = async () => {
         const rankedOptions = rankings.map((option, index) => ({
             optionId: option.id,
             rank: index + 1
         }));
         console.log("Ranked Options:", rankedOptions);
-        // Call the backend to submit the rankings
+
+        try {
+            await submitRanking(id, rankedOptions);
+            console.log('Rankings submitted successfully');
+            setSubmitted(true);  // Update the submitted state
+        } catch (error) {
+            console.error('Error submitting rankings:', error);
+        }
+    };
+
+    // Handle ending the poll
+    const handleEndPoll = async () => {
+        try {
+            await endPoll(id); // Call the service function with the poll ID
+            console.log('Poll ended successfully');
+            setPollEnded(true); // Update the state to reflect the poll has ended
+        } catch (error) {
+            console.error('Error ending poll:', error);
+        }
     };
 
     const PollOption = ({ option, index, moveOption }) => {
@@ -91,17 +155,45 @@ const PollPage = () => {
                     {poll ? (
                         <div>
                             <h2>{poll.title}</h2>
-                            <ul style={{ listStyle: 'none', padding: 0 }}>
-                                {rankings.map((option, index) => (
-                                    <PollOption
-                                        key={option.id}
-                                        option={option}
-                                        index={index}
-                                        moveOption={moveOption}
-                                    />
-                                ))}
-                            </ul>
-                            <button onClick={handleSubmitRankings}>Submit Rankings</button>
+                            {pollEnded ? (
+                                <div>
+                                    <h3>Final Rankings:</h3>
+                                    {finalRankings.length > 0 ? (
+                                        <ol>
+                                            {finalRankings.map((option) => (
+                                                <li key={option.id}>
+                                                    {option.name} - Average Rank: {option.averageRank === Number.MAX_VALUE ? 'N/A' : option.averageRank.toFixed(2)}
+                                                </li>
+                                            ))}
+                                        </ol>
+                                    ) : (
+                                        <p>No rankings available.</p>
+                                    )}
+                                </div>
+                            ) : submitted ? (
+                                <p>Ranking Submitted!</p>
+                            ) : (
+                                <>
+                                    {/* Render the options and submit button */}
+                                    <ul style={{ listStyle: 'none', padding: 0 }}>
+                                        {rankings.map((option, index) => (
+                                            <PollOption
+                                                key={option.id}
+                                                option={option}
+                                                index={index}
+                                                moveOption={moveOption}
+                                            />
+                                        ))}
+                                    </ul>
+                                    <button onClick={handleSubmitRankings}>Submit Rankings</button>
+                                </>
+                            )}
+                            {/* Conditionally render the "End Poll" button */}
+                            {isCreator && !pollEnded && (
+                                <button onClick={handleEndPoll} style={{ marginTop: '20px' }}>
+                                    End Poll
+                                </button>
+                            )}
                         </div>
                     ) : (
                         <p>Loading poll...</p>

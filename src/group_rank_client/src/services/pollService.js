@@ -13,11 +13,21 @@ export const getPoll = async (pollId) => {
 };
 
 export const submitRanking = async (pollId, rankings) => {
-    const response = await axios.post(`${API_URL}/${pollId}/rank`, rankings);
+    const response = await axios.post(`${API_URL}/${pollId}/submit-rankings`, rankings);
     return response.data;
 };
 
-export const finishPoll = async (pollId) => {
-    const response = await axios.put(`${API_URL}/${pollId}/finish`);
-    return response.data; // This will return the final poll results
+export const endPoll = async (pollId) => {
+    try {
+        const response = await axios.post(`${API_URL}/${pollId}/end`);
+        return response.data;
+    } catch (error) {
+        // Handle error appropriately
+        throw error.response ? error.response.data : error.message;
+    }
+};
+
+export const getPollResults = async (pollId) => {
+    const response = await axios.get(`${API_URL}/${pollId}/results`);
+    return response.data;
 };
