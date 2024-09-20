@@ -3,7 +3,6 @@ using group_rank.API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
 
 // Add CORS policy
@@ -27,7 +26,7 @@ builder.Services.AddDbContext<PollContext>(options =>
         )
     );
 
-// Add Swagger for API documentation (optional)
+// Add Swagger for API documentation
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

@@ -3,27 +3,27 @@ import { useParams, useLocation } from 'react-router-dom';
 import { getPoll, submitRankings, endPoll, getPollResults } from '../services/pollService';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import './PollPage.css'; // Import the CSS file
+import './PollPage.css';
 
 const ItemType = 'OPTION';
 
 const PollPage = () => {
-    const { id } = useParams();  // Get the poll ID from the URL
+    const { id } = useParams(); // Get the poll ID from the URL
     const location = useLocation(); // Access any state passed via navigation
-    const [poll, setPoll] = useState(null);  // State for the poll data
-    const [rankings, setRankings] = useState([]);  // State to store rankings
+    const [poll, setPoll] = useState(null); // State for the poll data
+    const [rankings, setRankings] = useState([]); // State to store rankings
     const [isCreator, setIsCreator] = useState(false); // Track if the user is the creator
-    const [submitted, setSubmitted] = useState(false);  // Track if rankings have been submitted
+    const [submitted, setSubmitted] = useState(false); // Track if rankings have been submitted
     const [pollEnded, setPollEnded] = useState(false); // Track if the poll has ended
     const [finalRankings, setFinalRankings] = useState([]); // Store final rankings
 
-    const pollLink = location.state?.pollLink || `${window.location.origin}/poll/${id}`;  // Poll link
+    const pollLink = location.state?.pollLink || `${window.location.origin}/poll/${id}`;
 
     // Fetch the poll data when the page loads
     useEffect(() => {
         const fetchPoll = async () => {
             try {
-                const data = await getPoll(id);  // Fetch the poll data from the backend
+                const data = await getPoll(id); // Fetch the poll data from the backend
                 setPoll(data);
                 setRankings(data.options);  // Initialize rankings with poll options
                 setPollEnded(data.isFinished);
@@ -53,7 +53,7 @@ const PollPage = () => {
                     console.error('Error checking poll status:', error);
                     clearInterval(interval);
                 }
-            }, 5000); // Check every 5 seconds
+            }, 5000);
 
             return () => clearInterval(interval); // Clean up on unmount
         }
@@ -75,7 +75,7 @@ const PollPage = () => {
         }
     }, [pollEnded, id]);
 
-    // Handle ranking changes (drag-and-drop result)
+    // Handle ranking changes
     const moveOption = (dragIndex, hoverIndex) => {
         const updatedRankings = [...rankings];
         const [removed] = updatedRankings.splice(dragIndex, 1);
@@ -83,7 +83,6 @@ const PollPage = () => {
         setRankings(updatedRankings);
     };
 
-    // Submit rankings
     const handleSubmitRankings = async () => {
         const rankedOptions = rankings.map((option, index) => ({
             optionId: option.id,
@@ -94,7 +93,7 @@ const PollPage = () => {
         try {
             await submitRankings(id, rankedOptions);
             console.log('Rankings submitted successfully');
-            setSubmitted(true);  // Update the submitted state
+            setSubmitted(true);
         } catch (error) {
             console.error('Error submitting rankings:', error);
         }
@@ -103,9 +102,9 @@ const PollPage = () => {
     // Handle ending the poll
     const handleEndPoll = async () => {
         try {
-            await endPoll(id); // Call the service function with the poll ID
+            await endPoll(id);
             console.log('Poll ended successfully');
-            setPollEnded(true); // Update the state to reflect the poll has ended
+            setPollEnded(true);
         } catch (error) {
             console.error('Error ending poll:', error);
         }

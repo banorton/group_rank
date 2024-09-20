@@ -2,8 +2,8 @@
 .poll-page {
     display: flex;
     min-height: 100vh;
-    background-color: #2F2F2F; /* Dark gray background */
-    color: #FFFFFF; /* White text */
+    background-color: #2F2F2F;
+    color: #FFFFFF;
 }
 
 /* Main Content */
@@ -54,7 +54,7 @@
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    background-color: #1E90FF; /* Blue color */
+    background-color: #1E90FF;
     color: #FFFFFF;
     text-align: center;
     font-size: 18px;
@@ -64,7 +64,7 @@
 }
 
 .poll-option.dragging {
-    background-color: #4A90E2; /* Lighter blue when dragging */
+    background-color: #4A90E2;
     opacity: 0.8;
 }
 
@@ -72,7 +72,7 @@
 .button {
     margin-top: 10px;
     padding: 10px 20px;
-    background-color: #4A90E2; /* Lighter blue */
+    background-color: #4A90E2;
     color: #FFFFFF;
     border: none;
     border-radius: 5px;
@@ -84,7 +84,7 @@
 .end-poll-button {
     margin-top: 20px;
     padding: 10px;
-    background-color: #D0021B; /* Red color */
+    background-color: #D0021B;
     color: #FFFFFF;
     border: none;
     border-radius: 5px;
@@ -96,7 +96,7 @@
 /* Copy Link Button */
 .copy-link-button {
     padding: 10px;
-    background-color: #4A90E2; /* Lighter blue */
+    background-color: #4A90E2;
     color: #FFFFFF;
     border: 1px solid #4A90E2;
     border-radius: 0 5px 5px 0;
@@ -119,16 +119,16 @@
 
 /* Hover and Active States for Buttons */
 .button:hover {
-    background-color: #357ABD; /* Darker blue on hover */
+    background-color: #357ABD;
 }
 
 .end-poll-button:hover {
-    background-color: #A80000; /* Darker red on hover */
+    background-color: #A80000;
 }
 
 .button:active,
 .end-poll-button:active {
-    transform: scale(0.98); /* Slightly shrink on click */
+    transform: scale(0.98);
 }
 
 .button:focus,
@@ -141,7 +141,7 @@
 .sidebar {
     width: 300px;
     padding: 20px;
-    background-color: #3F3F3F; /* Slightly lighter gray */
+    background-color: #3F3F3F;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -196,7 +196,7 @@
     margin-top: 20px;
 }
 
-/* Responsive Design (Optional) */
+/* Responsive Design */
 @media (max-width: 768px) {
     .sidebar {
         width: 100%;

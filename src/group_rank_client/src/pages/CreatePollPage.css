@@ -1,8 +1,8 @@
 /* Main Container */
 .create-poll-page {
     min-height: 100vh;
-    background-color: #2F2F2F; /* Dark gray background */
-    color: #FFFFFF; /* White text */
+    background-color: #2F2F2F;
+    color: #FFFFFF;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -13,7 +13,7 @@
 .form-container {
     width: 100%;
     max-width: 600px;
-    background-color: #3F3F3F; /* Slightly lighter gray */
+    background-color: #3F3F3F;
     padding: 40px;
     border-radius: 10px;
 }
@@ -44,7 +44,7 @@
 .button {
     width: 100%;
     padding: 10px;
-    background-color: #4A90E2; /* Lighter blue */
+    background-color: #4A90E2;
     color: #FFFFFF;
     border: none;
     border-radius: 5px;
@@ -62,11 +62,11 @@
 
 /* Hover and Active States for Buttons */
 .button:hover {
-    background-color: #357ABD; /* Darker blue on hover */
+    background-color: #357ABD;
 }
 
 .button:active {
-    transform: scale(0.98); /* Slightly shrink on click */
+    transform: scale(0.98);
 }
 
 /* Focus State for Accessibility */

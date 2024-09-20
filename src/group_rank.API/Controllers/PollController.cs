@@ -14,7 +14,7 @@ public class PollController : ControllerBase
         _context = context;
     }
 
-    // Handle preflight CORS requests (optional but useful for debugging)
+    // Handle preflight CORS requests
     [HttpOptions]
     public IActionResult Preflight()
     {
@@ -105,12 +105,10 @@ public class PollController : ControllerBase
         }
         catch (DbUpdateConcurrencyException ex)
         {
-            // Log the exception details if necessary
             return StatusCode(500, "A concurrency error occurred while saving your rankings.");
         }
         catch (Exception ex)
         {
-            // Handle other exceptions
             return StatusCode(500, "An error occurred while saving your rankings.");
         }
     }

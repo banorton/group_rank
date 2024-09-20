@@ -9,7 +9,7 @@ namespace group_rank.API.Data
 
         public DbSet<Poll> Polls { get; set; }
         public DbSet<Option> Options { get; set; }
-        public DbSet<Ranking> Rankings { get; set; } // Add this line to include Rankings
+        public DbSet<Ranking> Rankings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

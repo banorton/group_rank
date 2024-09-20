@@ -39,12 +39,12 @@ namespace group_rank.API.Models
     public class Ranking
     {
         [Key]
-        public Guid Id { get; set; } = Guid.NewGuid(); // Change Id to Guid (optional for consistency)
+        public Guid Id { get; set; } = Guid.NewGuid();
 
-        public Guid OptionId { get; set; } // Change from int to Guid
+        public Guid OptionId { get; set; }
 
         [ForeignKey("OptionId")]
-        public Option? Option { get; set; } // Navigation property
+        public Option? Option { get; set; }
 
         public int Rank { get; set; }
     }
