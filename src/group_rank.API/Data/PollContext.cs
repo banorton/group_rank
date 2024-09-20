@@ -15,23 +15,26 @@ namespace group_rank.API.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure default values for GUIDs
+            // Configure GUID properties for MySQL
             modelBuilder.Entity<Poll>()
                 .Property(p => p.Id)
-                .HasDefaultValueSql("NEWID()");
+                .HasColumnType("char(36)");
 
             modelBuilder.Entity<Option>()
                 .Property(o => o.Id)
-                .HasDefaultValueSql("NEWID()");
+                .HasColumnType("char(36)");
 
-            // Configure relationships between Poll and Option
+            modelBuilder.Entity<Ranking>()
+                .Property(r => r.Id)
+                .HasColumnType("char(36)");
+
+            // Configure relationships
             modelBuilder.Entity<Poll>()
                 .HasMany(p => p.Options)
                 .WithOne(o => o.Poll)
                 .HasForeignKey(o => o.PollId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Configure relationships between Option and Ranking
             modelBuilder.Entity<Option>()
                 .HasMany(o => o.Rankings)
                 .WithOne(r => r.Option)

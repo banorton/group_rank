@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace group_rank.API.Models
 {
@@ -26,7 +27,8 @@ namespace group_rank.API.Models
         public Guid PollId { get; set; }
 
         [ForeignKey("PollId")]
-        public required Poll Poll { get; set; }
+        [JsonIgnore]
+        public Poll? Poll { get; set; }
 
         public List<Ranking> Rankings { get; set; } = new List<Ranking>();
 

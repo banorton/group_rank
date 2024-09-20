@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import { getPoll, submitRanking, endPoll, getPollResults } from '../services/pollService';
+import { getPoll, submitRankings, endPoll, getPollResults } from '../services/pollService';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import './PollPage.css'; // Import the CSS file
@@ -92,7 +92,7 @@ const PollPage = () => {
         console.log("Ranked Options:", rankedOptions);
 
         try {
-            await submitRanking(id, rankedOptions);
+            await submitRankings(id, rankedOptions);
             console.log('Rankings submitted successfully');
             setSubmitted(true);  // Update the submitted state
         } catch (error) {

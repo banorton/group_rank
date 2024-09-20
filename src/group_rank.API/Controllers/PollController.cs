@@ -30,13 +30,14 @@ public class PollController : ControllerBase
             return BadRequest("Invalid poll data.");
         }
 
-        // Set GUIDs for Options if not set
+        // Set GUIDs and PollId for Options
         foreach (var option in poll.Options)
         {
             if (option.Id == Guid.Empty)
             {
                 option.Id = Guid.NewGuid();
             }
+            option.PollId = poll.Id;
         }
 
         _context.Polls.Add(poll);
@@ -70,15 +71,8 @@ public class PollController : ControllerBase
     [HttpPost("{id}/submit-rankings")]
     public async Task<IActionResult> SubmitRankings(Guid id, [FromBody] List<RankingSubmission> rankings)
     {
-        if (rankings == null || !rankings.Any())
-        {
-            return BadRequest("Rankings cannot be null or empty.");
-        }
-
-        // Retrieve the poll and include options
         var poll = await _context.Polls
             .Include(p => p.Options)
-            .ThenInclude(o => o.Rankings)
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (poll == null)
@@ -89,24 +83,36 @@ public class PollController : ControllerBase
         foreach (var rankingSubmission in rankings)
         {
             var option = poll.Options.FirstOrDefault(o => o.Id == rankingSubmission.OptionId);
-            if (option != null)
+            if (option == null)
             {
-                var newRanking = new Ranking
-                {
-                    OptionId = option.Id,
-                    Rank = rankingSubmission.Rank
-                };
-                option.Rankings.Add(newRanking);
+                return BadRequest($"Option with ID {rankingSubmission.OptionId} does not exist in this poll.");
             }
-            else
+
+            var ranking = new Ranking
             {
-                return BadRequest($"Option with ID {rankingSubmission.OptionId} not found in this poll.");
-            }
+                Id = Guid.NewGuid(), // Ensure a new GUID is generated
+                   OptionId = option.Id,
+                   Rank = rankingSubmission.Rank
+            };
+
+            _context.Rankings.Add(ranking);
         }
 
-        await _context.SaveChangesAsync();
-
-        return Ok("Rankings submitted successfully.");
+        try
+        {
+            await _context.SaveChangesAsync();
+            return Ok("Rankings submitted successfully.");
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            // Log the exception details if necessary
+            return StatusCode(500, "A concurrency error occurred while saving your rankings.");
+        }
+        catch (Exception ex)
+        {
+            // Handle other exceptions
+            return StatusCode(500, "An error occurred while saving your rankings.");
+        }
     }
 
     // POST: api/poll/{id}/end
@@ -147,11 +153,11 @@ public class PollController : ControllerBase
 
         // Calculate average rank for each option
         var optionsWithAverageRank = poll.Options.Select(o => new OptionResultDto
-        {
-            Id = o.Id,
-            Name = o.Name,
-            AverageRank = o.Rankings.Any() ? o.Rankings.Average(r => r.Rank) : double.MaxValue
-        }).ToList();
+                {
+                Id = o.Id,
+                Name = o.Name,
+                AverageRank = o.Rankings.Any() ? o.Rankings.Average(r => r.Rank) : double.MaxValue
+                }).ToList();
 
         // Order options by average rank
         var orderedOptions = optionsWithAverageRank.OrderBy(o => o.AverageRank).ToList();

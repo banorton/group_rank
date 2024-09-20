@@ -24,18 +24,16 @@ namespace group_rank.API.Migrations
 
             modelBuilder.Entity("group_rank.API.Models.Option", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("PollId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("PollId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
@@ -46,11 +44,9 @@ namespace group_rank.API.Migrations
 
             modelBuilder.Entity("group_rank.API.Models.Poll", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("char(36)");
 
                     b.Property<bool>("IsFinished")
                         .HasColumnType("tinyint(1)");
@@ -66,14 +62,12 @@ namespace group_rank.API.Migrations
 
             modelBuilder.Entity("group_rank.API.Models.Ranking", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("char(36)");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OptionId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("OptionId")
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("Rank")
                         .HasColumnType("int");
@@ -82,14 +76,18 @@ namespace group_rank.API.Migrations
 
                     b.HasIndex("OptionId");
 
-                    b.ToTable("Ranking");
+                    b.ToTable("Rankings");
                 });
 
             modelBuilder.Entity("group_rank.API.Models.Option", b =>
                 {
-                    b.HasOne("group_rank.API.Models.Poll", null)
+                    b.HasOne("group_rank.API.Models.Poll", "Poll")
                         .WithMany("Options")
-                        .HasForeignKey("PollId");
+                        .HasForeignKey("PollId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Poll");
                 });
 
             modelBuilder.Entity("group_rank.API.Models.Ranking", b =>
