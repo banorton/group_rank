@@ -3,6 +3,13 @@ using group_rank.API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (builder.Environment.IsProduction())
+{
+    builder.Configuration.AddJsonFile("appsettings.Production.json");
+} else {
+    builder.Configuration.AddJsonFile("appsettings.Development.json");
+}
+
 builder.Services.AddControllers();
 
 // Add CORS policy
